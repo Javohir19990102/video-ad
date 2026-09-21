@@ -203,13 +203,6 @@
 
     // Безопасная инициализация без всплывающих окон с ошибками
     let AdController = null;
-    try {
-        if (window.Adsgram) {
-            AdController = window.Adsgram.init({ blockId: "int-14408", debug: false });
-        }
-    } catch (err) {
-        console.log("Adsgram init error:", err);
-    }
 
     document.getElementById('downloadBtn').addEventListener('click', () => {
         const url = document.getElementById('videoUrl').value.trim();
