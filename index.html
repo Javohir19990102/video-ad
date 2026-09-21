@@ -3,120 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Video Downloader</title>
+    <title>Fast Video Downloader</title>
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Adsgram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #18222d;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
+        * {
             box-sizing: border-box;
-            text-align: center;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        .card {
-            background: #212d3b;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            max-width: 320px;
+        body {
+            background-color: var(--tg-theme-bg-color, #17212b);
+            color: var(--tg-theme-text-color, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
             width: 100%;
+            max-width: 400px;
+            background: var(--tg-theme-secondary-bg-color, #232e3c);
+            padding: 24px;
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
         }
-        h2 {
-            margin-top: 0;
-            font-size: 18px;
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header .icon {
+            font-size: 40px;
             margin-bottom: 8px;
         }
-        p {
-            font-size: 13px;
-            color: #8da0b3;
-            margin-bottom: 20px;
-            line-height: 1.4;
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
-        .btn-hd {
+        .header p {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color, #7e8c9b);
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--tg-theme-hint-color, #8da0b3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #334354;
+            background: #1b2633;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #2481cc;
+        }
+        .quality-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .quality-option {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            background: #1b2633;
+            border: 1px solid #334354;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .quality-option.active {
+            border-color: #2481cc;
+            background: rgba(36, 129, 204, 0.15);
+            font-weight: 600;
+            color: #2481cc;
+        }
+        .btn-download {
+            width: 100%;
             background: #2481cc;
             color: #ffffff;
             border: none;
-            padding: 12px 16px;
-            font-size: 14px;
+            padding: 14px;
+            font-size: 15px;
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
+            transition: opacity 0.2s;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             gap: 8px;
         }
-        .btn-hd:active {
-            background: #1b66a3;
+        .btn-download:active {
+            opacity: 0.85;
         }
-        .btn-standard {
-            background: transparent;
-            color: #8da0b3;
-            border: 1px solid #364759;
-            padding: 10px 16px;
-            font-size: 13px;
+        .status-box {
+            display: none;
+            margin-top: 16px;
+            padding: 12px;
             border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
+            background: rgba(36, 129, 204, 0.1);
+            color: #2481cc;
+            font-size: 13px;
+            text-align: center;
         }
-        .btn-standard:active {
-            background: rgba(255,255,255,0.05);
+        .features {
+            margin-top: 20px;
+            border-top: 1px solid #2e3e4f;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 11px;
+            color: #7e8c9b;
+        }
+        .features span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>🎬 Качество загрузки</h2>
-        <p>Выберите режим: посмотрите короткий ролик спонсора для загрузки в максимальном HD качестве или продолжите в стандартном.</p>
-        
-        <button class="btn-hd" id="watchAdBtn">
-            ⚡ Скачать в Ultra HD (ролик)
-        </button>
-        
-        <button class="btn-standard" id="skipAdBtn">
-            Обычное качество (без рекламы)
-        </button>
+<div class="container">
+    <div class="header">
+        <div class="icon">⚡</div>
+        <h1>Media Downloader</h1>
+        <p>Быстрая загрузка видео из TikTok и Instagram</p>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+    <div class="input-group">
+        <label for="videoUrl">Ссылка на видео</label>
+        <input type="text" id="videoUrl" placeholder="Вставьте ссылку https://...">
+    </div>
 
-        // Инициализация Adsgram (ID замените после активации платформы)
-        const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-14408" }) : null;
+    <div class="input-group">
+        <label>Качество видео</label>
+        <div class="quality-select">
+            <div class="quality-option active" id="optStandard">720p HD</div>
+            <div class="quality-option" id="optUltra">1080p Ultra HD ⚡</div>
+        </div>
+    </div>
 
-        // Кнопка 1: HD качество через просмотр рекламы
-        document.getElementById('watchAdBtn').addEventListener('click', () => {
-            if (AdController) {
-                AdController.show().then((result) => {
-                    tg.close();
-                }).catch((error) => {
-                    // Если рекламы нет в регионе, просто закрываем
-                    tg.close();
-                });
-            } else {
-                tg.close();
-            }
-        });
+    <button class="btn-download" id="downloadBtn">
+        <span>Скачать видео</span>
+    </button>
 
-        // Кнопка 2: Добровольный пропуск без рекламы (удовлетворяет правилу Adsgram)
-        document.getElementById('skipAdBtn').addEventListener('click', () => {
-            tg.close();
-        });
-    </script>
+    <div class="status-box" id="statusBox">
+        Обработка ссылки... Пожалуйста, подождите.
+    </div>
+
+    <div class="features">
+        <span>✓ Без водяных знаков</span>
+        <span>✓ Высокая скорость</span>
+        <span>✓ Бесплатно</span>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Переключение качества
+    let selectedMode = 'standard';
+    const optStandard = document.getElementById('optStandard');
+    const optUltra = document.getElementById('optUltra');
+
+    optStandard.addEventListener('click', () => {
+        optStandard.classList.add('active');
+        optUltra.classList.remove('active');
+        selectedMode = 'standard';
+    });
+
+    optUltra.addEventListener('click', () => {
+        optUltra.classList.add('active');
+        optStandard.classList.remove('active');
+        selectedMode = 'ultra';
+    });
+
+    // Инициализация Adsgram
+    const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-14408" }) : null;
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const url = document.getElementById('videoUrl').value.trim();
+        const status = document.getElementById('statusBox');
+
+        if (!url) {
+            alert("Пожалуйста, вставьте ссылку на видео!");
+            return;
+        }
+
+        status.style.display = 'block';
+        status.innerText = "Подготовка ссылки к скачиванию...";
+
+        // При выборе Ultra показываем рекламу как ускорение
+        if (selectedMode === 'ultra' && AdController) {
+            AdController.show().then(() => {
+                status.innerText = "Готово! Возвращаемся в бота...";
+                setTimeout(() => tg.close(), 1000);
+            }).catch(() => {
+                status.innerText = "Готово! Возвращаемся в бота...";
+                setTimeout(() => tg.close(), 1000);
+            });
+        } else {
+            status.innerText = "Готово! Загрузка передана в чат бота...";
+            setTimeout(() => tg.close(), 1200);
+        }
+    });
+</script>
+
 </body>
 </html>
