@@ -216,12 +216,14 @@
         status.style.display = 'block';
         status.innerText = "Подготовка ссылки к скачиванию...";
 
-        // При выборе Ultra показываем рекламу как ускорение
+      // При выборе Ultra показываем рекламу как ускорение
         if (selectedMode === 'ultra' && AdController) {
             AdController.show().then(() => {
                 status.innerText = "Готово! Возвращаемся в бота...";
                 setTimeout(() => tg.close(), 1000);
-            }).catch(() => {
+            }).catch((e) => {
+                // Если блок еще не активен или отклонен сетью, просто завершаем без ошибки
+                console.log("Ad not ready yet", e);
                 status.innerText = "Готово! Возвращаемся в бота...";
                 setTimeout(() => tg.close(), 1000);
             });
