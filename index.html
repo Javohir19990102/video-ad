@@ -201,8 +201,15 @@
         selectedMode = 'ultra';
     });
 
-    // Инициализация Adsgram
-    const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "int-14408" }) : null;
+    // Безопасная инициализация без всплывающих окон с ошибками
+    let AdController = null;
+    try {
+        if (window.Adsgram) {
+            AdController = window.Adsgram.init({ blockId: "int-14408", debug: false });
+        }
+    } catch (err) {
+        console.log("Adsgram init error:", err);
+    }
 
     document.getElementById('downloadBtn').addEventListener('click', () => {
         const url = document.getElementById('videoUrl').value.trim();
@@ -216,14 +223,14 @@
         status.style.display = 'block';
         status.innerText = "Подготовка ссылки к скачиванию...";
 
-      // При выборе Ultra показываем рекламу как ускорение
+        // Если выбрано Ultra и реклама доступна
         if (selectedMode === 'ultra' && AdController) {
             AdController.show().then(() => {
                 status.innerText = "Готово! Возвращаемся в бота...";
                 setTimeout(() => tg.close(), 1000);
             }).catch((e) => {
-                // Если блок еще не активен или отклонен сетью, просто завершаем без ошибки
-                console.log("Ad not ready yet", e);
+                // Игнорируем ошибку чужого blockId, чтобы окно не ругалось
+                console.log("Ad show bypass:", e);
                 status.innerText = "Готово! Возвращаемся в бота...";
                 setTimeout(() => tg.close(), 1000);
             });
